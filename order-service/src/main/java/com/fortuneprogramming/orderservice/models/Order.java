@@ -21,7 +21,7 @@ public class Order {
     @Column(name = "id", nullable = false)
     private Long id;
     private String orderNumber;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "order")
-    private List<OrderLineItem> orderLineItemsList;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<OrderItem> orderItemsList;
 
 }
