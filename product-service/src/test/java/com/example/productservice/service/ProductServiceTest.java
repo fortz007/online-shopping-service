@@ -35,12 +35,10 @@ class ProductServiceTest {
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:4.4.2");
     @Autowired
     private ProductRepository productRepository;
-
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
         dynamicPropertyRegistry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
     }
-
     @Test
     void shouldCreateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest("iphone 13", "Apple latest", BigDecimal.valueOf(1200));
@@ -49,15 +47,12 @@ class ProductServiceTest {
                         .content(new ObjectMapper().writeValueAsString(productRequest)))
                 .andExpect(status().isCreated());
         Assertions.assertEquals(1, productRepository.findAll().size());
-
     }
-
     @Test
     void getAllProducts() throws Exception {
         Product product1 = new Product(null,"iphone 13", "Apple latest", BigDecimal.valueOf(1200));
         Product product2 = new Product(null,"Galaxy S22", "Samsung's flagship", BigDecimal.valueOf(1000));
         productRepository.saveAll(List.of(product1, product2));
-
         // Call the endpoint and verify the response
         mockMvc.perform(MockMvcRequestBuilders.get("/api/product"))
                 .andExpect(status().isOk())
