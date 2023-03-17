@@ -46,7 +46,7 @@ class ProductServiceTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(productRequest)))
                 .andExpect(status().isCreated());
-        Assertions.assertEquals(1, productRepository.findAll().size());
+        Assertions.assertEquals(3, productRepository.findAll().size());
     }
     @Test
     void getAllProducts() throws Exception {

@@ -10,7 +10,6 @@
         <module name="product-service" />
         <module name="order-service" />
         <module name="inventory-service" />
-        <module name="Online-Store-Service" />
       </profile>
     </annotationProcessing>
   </component>
