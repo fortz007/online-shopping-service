@@ -1,5 +1,6 @@
 package com.fortuneprogramming.orderservice.services;
 
+import com.fortuneprogramming.orderservice.dtos.InventoryResponseDto;
 import com.fortuneprogramming.orderservice.dtos.OrderItemDto;
 import com.fortuneprogramming.orderservice.dtos.OrderRequestDto;
 import com.fortuneprogramming.orderservice.models.Order;
@@ -8,7 +9,10 @@ import com.fortuneprogramming.orderservice.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +21,7 @@ import java.util.UUID;
 @Transactional
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final WebClient webClient;
 
     public void placeOrder(OrderRequestDto orderRequestDto){
         Order order = new Order();
@@ -27,7 +32,25 @@ public class OrderService {
                 .toList();
         order.setOrderItemsList(orderItems);
 
-        orderRepository.save(order);
+        List<String> skuCodes = order.getOrderItemsList().stream()
+                .map(OrderItem::getSkuCode)
+                .toList();
+
+        InventoryResponseDto[] inventoryResponseList = webClient.get()
+                .uri("http://localhost:8082/api/inventory",
+                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .retrieve()
+                .bodyToMono(InventoryResponseDto[].class)
+                .block();
+
+
+        boolean productsInStock = Arrays.stream(inventoryResponseList)
+                .allMatch(InventoryResponseDto::getIsInStock);
+
+        if(productsInStock){
+            orderRepository.save(order);
+        }else
+            throw new IllegalArgumentException("Product is Out Of Stock, Kindly check out other product");
     }
     private OrderItem mapDtoToObject(OrderItemDto orderItemDto) {
         OrderItem orderItem = new OrderItem();

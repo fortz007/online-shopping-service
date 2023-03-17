@@ -1,5 +1,6 @@
 package com.fortuneprogramming.inventoryservice.controllers;
 
+import com.fortuneprogramming.inventoryservice.dtos.InventoryResponseDto;
 import com.fortuneprogramming.inventoryservice.services.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryController {
     private final InventoryService inventoryService;
-    @GetMapping("/{sku-code}")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public boolean isInStock(@PathVariable("sku-code") String skuCode){
-        boolean inStock = inventoryService.isInStock(skuCode);
-        return inStock;
+    public List<InventoryResponseDto> isInStock(@RequestParam List<String> skuCode){
+          return inventoryService.isInStock(skuCode);
     }
 }
